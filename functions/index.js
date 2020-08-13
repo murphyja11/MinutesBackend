@@ -9,7 +9,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // When a Audio Event is written to Firestore, update that users metrics
-exports.updateUserMetrics = functions.firestore
+exports.updateMetrics = functions.firestore
 .document('/events/{eventUID}')
 .onCreate((snap, context) => {
 
@@ -21,12 +21,12 @@ exports.updateUserMetrics = functions.firestore
    // do certain things depending on the type of event
    if (type === "audio_event") {
 
-        const userRef = db.collection('users').doc(data.user_uid);
+        const metricsRef = db.collection('metrics').doc(data.user_uid);
         
-       return userRef.update({
-            "metrics.numberOfMeditations": admin.firestore.FieldValue.increment(1),
-            "metrics.secondsListened": admin.firestore.FieldValue.increment(data.secondsListened)
-       });
+       return metricsRef.set({
+            numberOfMeditations: admin.firestore.FieldValue.increment(1),
+            secondsListened: admin.firestore.FieldValue.increment(data.secondsListened)
+       }, {merge: true});
 
    } else {
 
