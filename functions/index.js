@@ -24,6 +24,7 @@ exports.updateMetrics = functions.firestore
         const metricsRef = db.collection('metrics').doc(data.user_uid);
         
        return metricsRef.set({
+            user_uid: data.user_uid,
             numberOfMeditations: admin.firestore.FieldValue.increment(1),
             secondsListened: admin.firestore.FieldValue.increment(data.secondsListened)
        }, {merge: true});
