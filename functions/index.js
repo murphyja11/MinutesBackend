@@ -49,17 +49,28 @@ exports.initializeRecommendations = functions.firestore
 
 
     const userUID = context.params.userUID;
-    const ref = db.collection('users').doc(userUID);
+    const userRef = db.collection('users').doc(userUID);
+    const recRef = db.collection('recommendations').doc(userUID);
 
     // Make sure the recommendations array is empty
     if (recommendations.length === 0) {
         
-        const defaultRecommendations = ["NhPmhbJsi65rdMdstQFr", "lIPWxnPK0YMimLFo3Swl"];
+        // The UIDs of the default recommendations
+        const defaultRecommendations = ["NhPmhbJsi65rdMdstQFr", "lIPWxnPK0YMimLFo3Swl"]; 
 
-        // Return a promise to add the default initial recommendations
-        return ref.set({
-            recommendations: defaultRecommendations  // The UIDs of the default recommendations
+        let batch = db.batch();
+
+        // Perform a batched write to both the user document and the rec document
+        batch.set(userRef, {
+            recommendations: defaultRecommendations 
         }, {merge: true});
+        batch.set(recRef, {
+            array: defaultRecommendations
+        }, {merge: true});
+
+        // Commit the batched write
+        return batch.commit();
+
     } else {
         // This shouldn't happen
         return null;
