@@ -21,13 +21,34 @@ exports.updateMetrics = functions.firestore
    // do certain things depending on the type of event
    if (type === "audio_event") {
 
-        const metricsRef = db.collection('metrics').doc(data.user_uid);
-        
-       return metricsRef.set({
-            user_uid: data.user_uid,
-            numberOfMeditations: admin.firestore.FieldValue.increment(1),
-            secondsListened: admin.firestore.FieldValue.increment(data.secondsListened)
-       }, {merge: true});
+    const metricsRef = db.collection('metrics').doc(data.user_uid);
+
+    const genre = data.genre;
+
+    const datejs = data.time.toDate();
+    const day = datejs.getDate();
+    const month = datejs.getMonth();
+    const year = datejs.getFullYear();
+    const date = `${month}_${day}_${year}`;
+    
+    return metricsRef.set({
+        numberOfMeditations: admin.firestore.FieldValue.increment(1),
+        meditationsOverTime: {
+            [`${date}`]: admin.firestore.FieldValue.increment(1)
+        },
+        secondsListened: admin.firestore.FieldValue.increment(data.secondsListened),
+        secondsOverTime: {
+            [`${date}`]: admin.firestore.FieldValue.increment(data.secondsListened), 
+        },
+        genres: {
+            [`${genre}`]: admin.firestore.FieldValue.increment(1),
+        },
+        genresOverTime: {
+            [`${genre}`]: {
+                [`${date}`]: admin.firestore.FieldValue.increment(1)
+            }
+        }
+    }, {merge: true});
 
    } else {
 
@@ -45,14 +66,17 @@ exports.initializeRecommendations = functions.firestore
     
     // Retrieve the current user object
     const data = snap.data();
-    const recommendations = data.recommendations;
+    let recommendations = data.recommendations;
 
 
     const userUID = context.params.userUID;
     const userRef = db.collection('users').doc(userUID);
     const recRef = db.collection('recommendations').doc(userUID);
 
-    // Make sure the recommendations array is empty
+    // if the recommendations array is null set to empty
+    if (recommendations === null) {
+        recommendations = []
+    }
     if (recommendations.length === 0) {
         
         // The UIDs of the default recommendations
