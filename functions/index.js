@@ -33,19 +33,23 @@ exports.updateMetrics = functions.firestore
     
     return metricsRef.set({
         numberOfMeditations: admin.firestore.FieldValue.increment(1),
-        meditationsOverTime: {
-            [`${date}`]: admin.firestore.FieldValue.increment(1)
-        },
         secondsListened: admin.firestore.FieldValue.increment(data.secondsListened),
-        secondsOverTime: {
-            [`${date}`]: admin.firestore.FieldValue.increment(data.secondsListened), 
-        },
         genres: {
-            [`${genre}`]: admin.firestore.FieldValue.increment(1),
-        },
-        genresOverTime: {
             [`${genre}`]: {
-                [`${date}`]: admin.firestore.FieldValue.increment(1)
+                numberOfMeditations: admin.firestore.FieldValue.increment(1),
+                secondsListened: admin.firestore.FieldValue.increment(data.secondsListened)
+            }
+        },
+        daily: {
+            [`${date}`]: {
+                numberOfMeditations: admin.firestore.FieldValue.increment(1),
+                secondsListened: admin.firestore.FieldValue.increment(data.secondsListened),
+                genres: {
+                    [`${genre}`]: {
+                        numberOfMeditations: admin.firestore.FieldValue.increment(1),
+                        secondsListened: admin.firestore.FieldValue.increment(data.secondsListened)
+                    }
+                }
             }
         }
     }, {merge: true});
