@@ -23,7 +23,7 @@ exports.updateMetrics = functions.firestore
 
     const metricsRef = db.collection('metrics').doc(data.user_uid);
 
-    const genre = data.metadata.genre;
+    const genre = data.audio_metadata.genre;
 
     const datejs = data.time.toDate();
     const day = datejs.getDate();
