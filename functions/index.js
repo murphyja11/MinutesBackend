@@ -29,7 +29,10 @@ exports.updateMetrics = functions.firestore
     const day = datejs.getDate();
     const month = datejs.getMonth();
     const year = datejs.getFullYear();
-    const date = `${month}_${day}_${year}`;
+    const date = `${year}-${month}-${day}`;
+
+    //ISO8601DateFormatter.string(from: Date(), timeZone: TimeZone.current, 
+       //formatOptions: [.withFullDate, .withDashSeparatorInDate])
     
     return metricsRef.set({
         numberOfMeditations: admin.firestore.FieldValue.increment(1),
