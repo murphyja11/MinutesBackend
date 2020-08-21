@@ -26,10 +26,14 @@ exports.updateMetrics = functions.firestore
     const genre = data.audio_metadata.genre;
 
     const datejs = data.time.toDate();
+    console.log(datejs)
     const day = datejs.getDate();
-    const month = datejs.getMonth();
+    console.log(day)
+    const month = ((datejs.getMonth() + 1) < 10) ? ("0" + (datejs.getMonth() + 1)) : (datejs.getMonth() + 1); // because this ranges from 0-11, not 1-12
+    // get form YYYY-MM-DD
     const year = datejs.getFullYear();
     const date = `${year}-${month}-${day}`;
+    console.log(date)
 
     //ISO8601DateFormatter.string(from: Date(), timeZone: TimeZone.current, 
        //formatOptions: [.withFullDate, .withDashSeparatorInDate])
